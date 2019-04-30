@@ -6,9 +6,14 @@ set -o errexit  #   any command returns an error
 set -o pipefail #   ... even if that command isn't at the end of its pipeline
 set -o nounset  #   unset variables are expanded
 
-commit_message_file=$(realpath "$1"); shift
+commit_message_file="$(realpath "$1")"; shift
+first_line=$(head -n1 "$commit_message_file")
+
+# bail (with success) out if this is an amendment
+[[ -z $first_line ]] || exit 0
 
 hsk="${SUROS_KERNEL_DIR:-$HOME/kernel}" ; hsk=${hsk%/}
+diffconfig_file="$hsk/config/.diffconfig"
 
 cd $hsk/linux
 
@@ -17,3 +22,8 @@ kernver=$(make -s kernelversion)
 kernver=${kernver%%-*}
 
 sed -i -e "1c $kernver - " "$commit_message_file"
+if [[ -f "$diffconfig_file" ]] ; then
+  sed -i -e '1G' "$commit_message_file"  # blank line
+  sed -i -e "2r $diffconfig_file" "$commit_message_file"
+  rm "$diffconfig_file"
+fi
