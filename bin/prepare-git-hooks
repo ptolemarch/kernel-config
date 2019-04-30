@@ -1,0 +1,22 @@
+#! /bin/bash
+
+# eventually, I'd like to augment this script with my own _warn(), etc.
+                # stop the script immediately if
+set -o errexit  #   any command returns an error
+set -o pipefail #   ... even if that command isn't at the end of its pipeline
+set -o nounset  #   unset variables are expanded
+
+# am I in a .git root directory?
+if [[ -d .git ]]; then :; else
+  echo "not in a git directory, I think?" >&2
+  exit 1
+fi
+
+if [[ -d bin/git-hooks ]]; then :; else
+  echo "can't find hooks/ directory" >&2
+  exit 1
+fi
+
+for hook in bin/git-hooks/* ; do
+  ln --verbose --symbolic --relative --force "$hook" .git/hooks/
+done

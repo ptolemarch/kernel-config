@@ -1,0 +1,19 @@
+#! /bin/bash
+
+# eventually, I'd like to augment this script with my own _warn(), etc.
+                # stop the script immediately if
+set -o errexit  #   any command returns an error
+set -o pipefail #   ... even if that command isn't at the end of its pipeline
+set -o nounset  #   unset variables are expanded
+
+commit_message_file=$(realpath "$1"); shift
+
+hsk="${SUROS_KERNEL_DIR:-$HOME/kernel}" ; hsk=${hsk%/}
+
+cd $hsk/linux
+
+# get kernel version for git commit
+kernver=$(make -s kernelversion)
+kernver=${kernver%%-*}
+
+sed -i -e "1c $kernver - " "$commit_message_file"

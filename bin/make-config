@@ -1,0 +1,80 @@
+#! /bin/bash
+
+# `make nconfig` but keep config in version control
+
+# eventually, I'd like to augment this script with my own _warn(), etc.
+                # stop the script immediately if
+set -o errexit  #   any command returns an error
+set -o pipefail #   ... even if that command isn't at the end of its pipeline
+set -o nounset  #   unset variables are expanded
+
+#set -o verbose  # as I'm debugging this script, anyway
+
+hsk="${SUROS_KERNEL_DIR:-$HOME/kernel}" ; hsk=${hsk%/}
+
+cd ${hsk}
+
+# make sure that ${hsk}/tmp is mounted tmpfs
+# but, first, it would be weird if the parent is a tmpfs
+hsk_fs="$(df -T . | tail -n 1 | awk '{print $2}')"
+if [[ $hsk_fs = "tmpfs" && -z $WHOLE_KERNEL_IS_TMPFS ]] ; then
+  cat >&2 <<ERRMSG
+directory ${hsk} is a tmpfs. This is weird.
+
+If this is what you expected, set WHOLE_KERNEL_IS_TMPFS and try again.
+ERRMSG
+  exit 1
+fi
+
+hskt_fs="$(df -T tmp | tail -n 1 | awk '{print $2}')"
+if [[ $hskt_fs = "tmpfs" ]]; then :; else
+  fs_file="${hsk}/tmp"
+  fs_spec=${fs_file#/} ; fs_spec=${fs_spec//\//_} fs_spec="/tmpfs/$fs_spec"
+  uid=$(id -u)
+  gid=$(id -g)
+  cat >&2 <<ERRMSG
+directory ${fs_file} isn't a tmpfs
+
+You might want to fix this using something like:
+  mount \\
+    -t tmpfs \\
+    -o rw,noatime,nodiratime,nodev,uid=$uid,gid=$gid,mode=755 \\
+    $fs_spec \\
+    $fs_file
+ERRMSG
+  exit 1
+fi
+
+# verify config-tmp symlink
+config_tmp="${hsk}/config/config-tmp"
+if [[ -L "$config_tmp" && -e "$config_tmp" ]]; then :; else
+  echo "making symlink to config-tmp"
+  cd config
+  ln -sf ../tmp/.config config-tmp
+  cd ..
+fi
+
+# make sure config is already checked in
+cd config
+if git diff-index --quiet HEAD --; then :; else
+  cat >&2 <<ERRMSG
+git repository in ${hsk}/config has uncommitted changes
+ERRMSG
+  exit 1
+fi
+cd ..
+
+cd linux
+# get kernel version for git commit
+kernver=$(make -s kernelversion)
+kernver=${kernver%%-*}
+
+# configure kernel
+make nconfig
+
+# commit change
+cd ../config
+git commit 
+
+# NOTE: code to prepend kernel version to commit message is in git hook:
+#  ~/kernel/config/hooks/prepare-commit-msg
