@@ -1,0 +1,24 @@
+Processor is an Intel Core i7-7820HK @ 2.9GHz (Kaby Lake)
+  Kaby Lake
+  Family 6 Model 158 Stepping 9
+    Extended Family 0
+             Family 0x6
+    Extended Model  0x9
+             Model  0xE
+    Stepping        0x9
+        
+Motherboard is Clevo P65_67HSHP
+Chipset is Intel CM238 (Sunrise Point-H)
+
+WikiChip page for processor:
+  https://en.wikichip.org/wiki/intel/core_i7/i7-7820hk
+
+Intel page for processor:
+  https://ark.intel.com/content/www/us/en/ark/products/97464/intel-core-i7-7820hk-processor-8m-cache-up-to-3-90-ghz.html
+
+Intel page for chipset:
+  https://ark.intel.com/content/www/us/en/ark/products/98087/mobile-intel-cm238-chipset.html
+
+HW_PROBE:
+  https://linux-hardware.org/?probe=08d4311b50
+  https://linux-hardware.org/?probe=2e69b68af5
