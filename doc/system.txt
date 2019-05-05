@@ -1,7 +1,12 @@
 System76 Oryx Pro 3 (purchased early 2017)
 
 Might essentially be a Clevo P650HS-G 
+
   https://wiki.gentoo.org/wiki/Clevo_P650HS-G
+
+  If so, also similar to:
+  - Sager NP8157
+  - Tuxedo XC1507v2
 
 Also very similar to Clevo P650HP6, but that has an nVidia GeForce GTX1060
 
