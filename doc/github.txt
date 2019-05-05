@@ -1,0 +1,5 @@
+clevo-xsm-wmi
+
+https://github.com/cnlohr/clevo_xsm_wmi
+
+https://bitbucket.org/tuxedocomputers/clevo-xsm-wmi/
