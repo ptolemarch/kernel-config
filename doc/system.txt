@@ -1,3 +1,10 @@
+System76 Oryx Pro 3 (purchased early 2017)
+
+Might essentially be a Clevo P650HS-G 
+  https://wiki.gentoo.org/wiki/Clevo_P650HS-G
+
+Also very similar to Clevo P650HP6, but that has an nVidia GeForce GTX1060
+
 Processor is an Intel Core i7-7820HK @ 2.9GHz (Kaby Lake)
   Kaby Lake
   Family 6 Model 158 Stepping 9
@@ -6,19 +13,34 @@ Processor is an Intel Core i7-7820HK @ 2.9GHz (Kaby Lake)
     Extended Model  0x9
              Model  0xE
     Stepping        0x9
+
+Video
+  - nVidia GeForce GTX 1070
+    8GB VRAM
+  - Intel HD Graphics 630
         
 Motherboard is Clevo P65_67HSHP
 Chipset is Intel CM238 (Sunrise Point-H)
+Video card is 
 
 WikiChip page for processor:
+
   https://en.wikichip.org/wiki/intel/core_i7/i7-7820hk
 
 Intel page for processor:
+
   https://ark.intel.com/content/www/us/en/ark/products/97464/intel-core-i7-7820hk-processor-8m-cache-up-to-3-90-ghz.html
 
 Intel page for chipset:
-  https://ark.intel.com/content/www/us/en/ark/products/98087/mobile-intel-cm238-chipset.html
+  Probably this one:
+
+    https://ark.intel.com/content/www/us/en/ark/products/98085/mobile-intel-hm175-chipset.html
+
+  But maybe this one:
+
+    https://ark.intel.com/content/www/us/en/ark/products/98087/mobile-intel-cm238-chipset.html
 
 HW_PROBE:
+
   https://linux-hardware.org/?probe=08d4311b50
   https://linux-hardware.org/?probe=2e69b68af5
