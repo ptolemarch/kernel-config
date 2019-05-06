@@ -1,0 +1,5 @@
+Some random notes for how all this works because I had to look it up again.
+
+build-time env vars documented at
+
+  Documentation/kbuild/kbuild.txt
