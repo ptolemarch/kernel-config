@@ -15,7 +15,7 @@ hsk="${SUROS_KERNEL_DIR:-$HOME/kernel}" ; hsk=${hsk%/}
 
 kernel_build_error() {
   local parent_lineno="$1"
-  local message="$2"
+  local message="${2:-}"
   local code="${3:-1}"
 
   cat >&2 <<ERRMSG
