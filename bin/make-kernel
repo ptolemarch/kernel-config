@@ -52,15 +52,16 @@ trap 'kernel_build_error ${LINENO}' ERR
 export KBUILD_OUTPUT="$hsk/tmp"
 cd "$hsk"
 
+## TODO: Not sure why I care after all
 # make sure config is already checked in
-cd config
-if git diff-index --quiet HEAD --; then :; else
-  cat >&2 <<ERRMSG
-git repository in ${hsk}/config has uncommitted changes
-ERRMSG
-  exit 1
-fi
-cd ..
+#cd config
+#if git diff-index --quiet HEAD --; then :; else
+#  cat >&2 <<ERRMSG
+#git repository in ${hsk}/config has uncommitted changes
+#ERRMSG
+#  exit 1
+#fi
+#cd ..
 
 # make sure that ${hsk}/tmp is mounted tmpfs
 # but, first, it would be weird if the parent is a tmpfs
@@ -121,10 +122,12 @@ cd "$hsk"
 end_seconds=$SECONDS
 
 duration=$(( end_seconds - start_seconds ))
-echo -n "duration: " ; date -d@$duration -u +"%j days, %H:%M:%S"
+echo -n "duration: " ; date -d@$duration -u +"%H:%M:%S"
 echo -n "end: " ; date
 
 # copy build output
-echo "confirm we should delete '$hsk/build':" >&2
-rm -Ir "$hsk/build"  # first, remove what's there
+if [[ -a "$hsk/build" ]]; then
+  echo "confirm we should delete '$hsk/build':" >&2
+  rm -Ir "$hsk/build"  # first, remove what's there
+fi
 cp -a "$hsk/tmp" "$hsk/build"
