@@ -9,3 +9,7 @@ Pappy's Preconfigs
   https://wiki.gentoo.org/wiki/Kernel/Configuration/Kernel_Seeds
 
   https://forums.gentoo.org/viewtopic-t-1051430-postdays-0-postorder-asc-start-100.html
+
+gg7's Gentoo Kernel Guide
+
+  https://github.com/gg7/gentoo-kernel-guide
