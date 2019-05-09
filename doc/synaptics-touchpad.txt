@@ -1,0 +1,12 @@
+There's a patch that claims to enable RMI4 for us:
+
+https://patchwork.kernel.org/cover/10548931/
+https://patchwork.kernel.org/patch/10548933/
+
+As of 4.19.41 / 5.0.14 / 5.1, it still doesn't seem to be in there:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/drivers/input/mouse/synaptics.c?h=v4.19.41#n168
+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/drivers/input/mouse/synaptics.c?h=v5.0.14#n168
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/input/mouse/synaptics.c?h=v5.1#n168
+
+I wonder whether it would be appropriate to patch the thing myself.
