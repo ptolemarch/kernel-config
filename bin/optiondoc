@@ -1,0 +1,20 @@
+#! /bin/bash
+# vim: ts=2 sw=2 et
+
+# show the documentation for a given config option
+#  in /usr/src/linux/**/*Kconfig*
+#  (more or less)
+
+option=$1; shift
+
+# there could be more than one
+kconfigs=$(
+  grep \
+    --recursive \
+    --files-with-matches \
+    "$option" \
+    /usr/src/linux \
+  | grep Kconfig
+)
+
+view +/"$option" $kconfigs
