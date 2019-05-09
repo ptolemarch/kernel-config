@@ -26,14 +26,16 @@ while (<>) {
 
     my %re = regexen();
 
-    enable(%+)   if /^$re{yes}   \s+ $re{opt}$/x;
-    disable(%+)  if /^$re{no}    \s+ $re{opt}$/x;
-    module(%+)   if /^$re{mod}   \s+ $re{opt}$/x;
+    enable(%+)   , next if /^$re{yes}   \s+ $re{opt}$/x;
+    disable(%+)  , next if /^$re{no}    \s+ $re{opt}$/x;
+    module(%+)   , next if /^$re{mod}   \s+ $re{opt}$/x;
 
-    set_str(%+)  if /^$re{str}   \s+ $re{opt}$/x;
-    set_val(%+)  if /^$re{val}   \s+ $re{opt}$/x;
+    set_str(%+)  , next if /^$re{str}   \s+ $re{opt}$/x;
+    set_val(%+)  , next if /^$re{val}   \s+ $re{opt}$/x;
 
-    undefine(%+) if /^$re{undef} \s+ $re{opt}$/x;
+    undefine(%+) , next if /^$re{undef} \s+ $re{opt}$/x;
+
+    warn "unable to understand line $.";
 }
 
 sub regexen
@@ -138,6 +140,10 @@ sub _scripts_config
         my $retval = $? >> 8;
 
 
+        # TODO: it would be cool if the changes to the config file happened,
+        #  so to speak, as a transaction.  Like, if there's a problem, it rolls back.
+        #  Probably by making the changes to a temporary file and then copying it all over.
+        #  And using a backup file for the original.
         die <<~"DEATH"
             Unable to exec
               $CONFIG_SCRIPT \\
