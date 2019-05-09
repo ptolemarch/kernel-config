@@ -1,0 +1,150 @@
+#! /usr/bin/perl
+# vim: ts=4 sw=4 et
+
+use warnings;
+use 5.26.0;
+
+our $CONFIG_FILE = '/home/suros/kernel/tmp/.config';
+our $CONFIG_SCRIPT = '/usr/src/linux/scripts/config';
+
+# WOOL GATHERING:
+# It would be neat to make a module that provides functionality similar to
+#   /usr/src/linux/scripts/config
+# Some sort of Linux kernel configuration helper module including also
+#   - query things like what options a given option depends on
+#   - what's its help text
+#   - what modules / source files does it enable
+
+# read spec file given on command line
+while (<>) {
+                   # account once, here for
+    s/^\s*//;      # ...leading whitespace
+    s/\s*$//;      # ...and trailing whitespace
+
+    next if /^#/;  # comments must be on their own line
+    next if /^$/;  # skip blank lines
+
+    my %re = regexen();
+
+    enable(%+)   if /^$re{yes}   \s+ $re{opt}$/x;
+    disable(%+)  if /^$re{no}    \s+ $re{opt}$/x;
+    module(%+)   if /^$re{mod}   \s+ $re{opt}$/x;
+
+    set_str(%+)  if /^$re{str}   \s+ $re{opt}$/x;
+    set_val(%+)  if /^$re{val}   \s+ $re{opt}$/x;
+
+    undefine(%+) if /^$re{undef} \s+ $re{opt}$/x;
+}
+
+sub regexen
+{
+    return (
+        opt   => qr/(?<opt>[A-Z0-9_]+)/,
+
+        yes   => qr/(?<set>y(es)?)/n,
+        no    => qr/(?<set>n(o)?)/n,
+        mod   => qr/(?<set>m(od(ule)?)?)/n,
+
+        str   => qr/(?<set>")(?<str>[^"]*)"/n,  # double-quoted for strings,
+        val   => qr/(?<set>')(?<val>[^"]*)'/n,  # but single-quoted for values
+
+        undef => qr/u(ndef)?/n,
+    );
+}
+
+# Seems like there could be a lot of refactoring to be done here.
+# But this is quite comprehensible, and my aggressive attempt at refactoring
+#  was not.
+
+sub enable  # --enable|-e option       Enable option
+{
+    my %arg = @_;
+
+    _scripts_config(
+        '--enable', $arg{opt}
+    );
+
+    return;
+}
+
+sub disable  # --disable|-d option     Disable option
+{
+    my %arg = @_;
+
+    _scripts_config(
+        '--disable', $arg{opt}
+    );
+
+    return;
+}
+
+sub module  # --module|-m option       Turn option into a module
+{
+    my %arg = @_;
+
+    _scripts_config(
+        '--module', $arg{opt}
+    );
+
+    return;
+}
+
+sub set_str  # --set-str option string  Set option to "string"
+{
+    my %arg = @_;
+
+    _scripts_config(
+        '--set-str', $arg{opt}, $arg{str}
+    );
+
+    return;
+}
+
+sub set_val  # --set-val option value   Set option to value
+{
+    my %arg = @_;
+
+    _scripts_config(
+        '--set-val', $arg{opt}, $arg{val}
+    );
+
+    return;
+}
+
+sub undefine  # --undefine|-u option     Undefine option
+{
+    my %arg = @_;
+
+    _scripts_config(
+        '--undefine', $arg{opt}
+    );
+
+    return;
+}
+
+sub _scripts_config
+{
+    unless(
+        system(
+            $CONFIG_SCRIPT,
+            '--file', $CONFIG_FILE,
+            @_
+        ) == 0
+    ) {
+        my $args = "$_[0] $_[1]"
+                 . defined $_[2] ? " '$_[2]'" : ""
+                 ;
+
+        my $retval = $? >> 8;
+
+
+        die <<~"DEATH"
+            Unable to exec
+              $CONFIG_SCRIPT \\
+                --file '$CONFIG_FILE' \\
+                $args
+            Exit code: $retval
+            Error is: '$!'
+            DEATH
+    }
+}
