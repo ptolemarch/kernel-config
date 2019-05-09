@@ -1,0 +1,20 @@
+Precision Time Protocol
+
+Some sort of neat time thingy? I dunno. Looks cool.
+
+https://wiki.gentoo.org/wiki/Chrony
+https://wiki.gentoo.org/wiki/Chrony_with_hardware_timestamping#Verifying_the_NIC_PTP_device_clock
+
+Here's where it's defined:
+
+	Symbol: PTP_1588_CLOCK [=y]
+	Type  : tristate
+	Prompt: PTP clock support
+	  Location:
+	    -> Device Drivers
+	      -> PTP clock support
+	  Defined at drivers/ptp/Kconfig:7
+
+Possibly my network card has support for PTP via "Software Timestamping"?
+
+  https://github.com/openil/linuxptp
