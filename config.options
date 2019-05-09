@@ -1,0 +1,5 @@
+# vim: ft=conf
+
+"-suros-1" LOCALVERSION
+
+"Patrick" CONFIG_DEFAULT_HOSTNAME
