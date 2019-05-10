@@ -1,0 +1,42 @@
+from `amixer`:  (actually from HW PROBE: http://bit.ly/2DseX8H)
+
+    Card hw:0 'PCH'/'HDA Intel PCH at 0x2ffff20000 irq 136'
+      Mixer name : 'Realtek ALC898'
+      Components : 'HDA:10ec0899,155865a2,00100003'
+      Controls : 29
+      Simple ctrls : 12
+    Card hw:1 'NVidia'/'HDA NVidia at 0xdc080000 irq 17'
+      Mixer name : 'Nvidia GPU 83 HDMI/DP'
+      Components : 'HDA:10de0083,155865a1,00100100'
+      Controls : 21
+      Simple ctrls : 3
+
+from `lspci`:
+
+000:1f.3 Audio device [0403]: Intel Corporation CM238 HD Audio Controller [8086:a171] (rev 31)
+        Subsystem: CLEVO/KAPOK Computer CM238 HD Audio Controller [1558:65a2]
+        Flags: bus master, fast devsel, latency 32, IRQ 136
+        Memory at 2ffff20000 (64-bit, non-prefetchable) [size=16K]
+        Memory at 2ffff00000 (64-bit, non-prefetchable) [size=64K]
+        Capabilities: [50] Power Management version 3
+        Capabilities: [60] MSI: Enable+ Count=1/1 Maskable- 64bit+
+        Kernel driver in use: snd_hda_intel
+01:00.1 Audio device [0403]: NVIDIA Corporation GP104 High Definition Audio Controller [10de:10f0] (rev a1)
+        Subsystem: CLEVO/KAPOK Computer GP104 High Definition Audio Controller [1558:65a1]
+        Flags: bus master, fast devsel, latency 0, IRQ 17
+        Memory at dc080000 (32-bit, non-prefetchable) [size=16K]
+        Capabilities: [60] Power Management version 3
+        Capabilities: [68] MSI: Enable- Count=1/1 Maskable- 64bit+
+        Capabilities: [78] Express Endpoint, MSI 00
+        Capabilities: [100] Advanced Error Reporting
+        Kernel driver in use: snd_hda_intel
+
+Realtek page on ALC898 (not super useful, perhaps)
+https://www.realtek.com/en/products/computer-peripheral-ics/item/alc898
+
+
+notes on Edirol UX-1 USB MIDI adapter:
+http://michaelminn.com/linux/mmusbaudio/README.html
+(in short:
+  - use snd-usb-audio
+  - make sure switch on side of device, "ADVANCED DRIVER", is "OFF")
