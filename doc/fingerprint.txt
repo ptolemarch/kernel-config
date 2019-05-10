@@ -1,0 +1,6 @@
+not supported in the kernel itself.
+
+Looks like it is supported by sys-auth/fprintd
+
+USB [1c7a:0603] "EgisTec ES603"
+https://fprint.freedesktop.org/supported-devices.html
