@@ -130,7 +130,7 @@ sub _scripts_config
         system(
             $CONFIG_SCRIPT,
             '--file', $CONFIG_FILE,
-            @_
+            '--keep-case', @_
         ) == 0
     ) {
         my $args = "$_[0] $_[1]"
