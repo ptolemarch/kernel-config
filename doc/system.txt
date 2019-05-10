@@ -19,6 +19,14 @@ Processor is an Intel Core i7-7820HK @ 2.9GHz (Kaby Lake)
              Model  0xE
     Stepping        0x9
 
+I keep wondering whether I have LPSS (Low Power Subsystem). I don't. I know
+this because apparently `lspci` would be fairly clear about it, if I did:
+
+  https://wiki.gentoo.org/wiki/Dell_XPS_15_9550
+
+I figure this probably means I don't need CONFIG_INTEL_IDMA64 (and therefore
+also not CONFIG_DMADEVICES).
+
 Video
   - nVidia GeForce GTX 1070
     8GB VRAM
