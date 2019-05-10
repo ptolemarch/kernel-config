@@ -1,0 +1,8 @@
+full kernel support coming in Linux 5.2:
+
+    https://www.phoronix.com/scan.php?page=news_item&px=U2F-Zero-Driver-Linux-5.2
+    https://www.phoronix.com/scan.php?page=news_item&px=HID-For-Linux-5.2-Changes
+
+unmaintained software:
+
+    https://github.com/conorpp/u2f-zero
