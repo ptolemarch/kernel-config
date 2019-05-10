@@ -1,0 +1,27 @@
+Realtek RTL8411B PCI Express Card Reader
+
+    https://www.realtek.com/en/products/communications-network-ics/item/rtl8411b-n
+
+Apparently needs both
+    CONFIG_MISC_RTSX_PCI
+and
+    CONFIG_MMC_REALTEK_PCI:
+
+    https://forums.gentoo.org/viewtopic-t-1082690-start-0.html
+
+6d:00.0 Unassigned class [ff00]: Realtek Semiconductor Co., Ltd. RTL8411B PCI Express Card Reader [10ec:5287] (rev 01)
+        Subsystem: CLEVO/KAPOK Computer RTL8411B PCI Express Card Reader [1558:65a1]
+        Flags: bus master, fast devsel, latency 0, IRQ 122
+        Memory at dc305000 (32-bit, non-prefetchable) [size=4K]
+        [virtual] Expansion ROM at dc310000 [disabled] [size=64K]
+        Capabilities: [40] Power Management version 3
+        Capabilities: [50] MSI: Enable+ Count=1/1 Maskable- 64bit+
+        Capabilities: [70] Express Endpoint, MSI 00
+        Capabilities: [b0] MSI-X: Enable- Count=1 Masked-
+        Capabilities: [d0] Vital Product Data
+        Capabilities: [100] Advanced Error Reporting
+        Capabilities: [140] Virtual Channel
+        Capabilities: [160] Device Serial Number 00-00-00-00-00-00-00-00
+        Capabilities: [170] Latency Tolerance Reporting
+        Capabilities: [178] L1 PM Substates
+        Kernel driver in use: rtsx_pci
