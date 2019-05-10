@@ -1,0 +1,10 @@
+Griffin PowerMate:
+
+use kernel INPUT_POWERMATE
+
+    https://github.com/stefansundin/powermate-linux
+    http://wirefall.dyndns.org/powermate.html
+
+Contour Design ShuttleXpress:
+
+    https://github.com/threedaymonk/shuttlexpress
