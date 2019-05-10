@@ -41,7 +41,7 @@ while (<>) {
 sub regexen
 {
     return (
-        opt   => qr/(?<opt>[A-Z0-9_]+)/,
+        opt   => qr/(?<opt>[A-Za-z0-9_]+)/,
 
         yes   => qr/(?<set>y(es)?)/n,
         no    => qr/(?<set>n(o)?)/n,
