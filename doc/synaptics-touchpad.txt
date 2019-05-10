@@ -10,3 +10,11 @@ https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/drivers/in
 https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/input/mouse/synaptics.c?h=v5.1#n168
 
 I wonder whether it would be appropriate to patch the thing myself.
+
+
+
+*** There's this little note at the bottom of the Gentoo page for synaptics
+    input that suggests that one might want to use "libinput" instead:
+
+    https://wiki.gentoo.org/wiki/Synaptics
+    https://wiki.gentoo.org/wiki/Libinput
