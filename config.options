@@ -203,8 +203,6 @@ y PINCTRL_SUNRISEPOINT
 y GPIO_SYSFS
 #=== Memory mapped GPIO drivers
 y GPIO_LYNXPOINT
-#== Power supply class support
-y POWER_SUPPLY_DEBUG
 #== Hardware Monitoring support
 y SENSORS_CORETEMP
 y SENSORS_ACPI_POWER
