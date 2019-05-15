@@ -5,12 +5,16 @@
 "Patrick" DEFAULT_HOSTNAME
 m IKCONFIG
 y IKCONFIG_PROC
+y BPF_SYSCALL
 #== Kernel compression mode
 n KERNEL_GZIP
 y KERNEL_LZ4
 #== Preemption Model
 n PREEMPT_VOLUNTARY
 y PREEMPT
+#== Control Group support
+y CGROUP_BPF
+
 
 #= Processor type and features
 '8' NR_CPUS
@@ -80,6 +84,8 @@ n DMADEVICES
 n UIO
 n X86_PLATFORM_DEVICES
 y POWERCAP
+#== Generic Driver Options
+"" UEVENT_HELPER_PATH
 #== NVME Support
 y BLK_DEV_NVME
 #== Misc devices
