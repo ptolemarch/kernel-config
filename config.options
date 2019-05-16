@@ -86,6 +86,8 @@ n X86_PLATFORM_DEVICES
 y POWERCAP
 #== Generic Driver Options
 "" UEVENT_HELPER_PATH
+#=== Firmware loader
+"i915/kbl_dmc_ver1_04.bin" EXTRA_FIRMWARE
 #== NVME Support
 y BLK_DEV_NVME
 #== Misc devices
