@@ -231,12 +231,13 @@ m USB_VIDEO_CLASS
 #== Graphics support
 n AGP
 n LOGO
+#=== Frame buffer Devices
+n FB_EFI
 #=== Backlight & LCD device support
 y LCD_CLASS_DEVICE
 y LCD_PLATFORM
 #=== Console display driver support
-'1024' VGACON_SOFT_SCROLLBACK_SIZE
-y VGACON_SOFT_SCROLLBACK_PERSISTENT_ENABLE_BY_DEFAULT
+n VGACON_SOFT_SCROLLBACK
 # (this might be nice in the future)
 # y FRAMEBUFFER_CONSOLE_DEFERRED_TAKEOVER
 #== Sound card support
@@ -382,6 +383,11 @@ y FONTS
 n FONT_8x8
 n FONT_8x16
 y FONT_10x18
+
+#= Kernel hacking
+n DEBUG_KERNEL
+n PROVIDE_OHCI1394_DMA_INIT
+n EARLY_PRINTK_DBGP
 
 #= Gentoo Linux
 #== Support for init systems, system and service managers
