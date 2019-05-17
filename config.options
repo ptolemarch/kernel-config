@@ -1,7 +1,7 @@
 # vim: ft=conf
 
 #= General setup
-"-suros-1" LOCALVERSION
+"-suros-2" LOCALVERSION
 "Patrick" DEFAULT_HOSTNAME
 m IKCONFIG
 y IKCONFIG_PROC
@@ -77,7 +77,8 @@ y CFG80211_WEXT
 n MACINTOSH_DRIVERS
 y PINCTRL
 n WATCHDOG
-y MEDIA_SUPPORT
+m MEDIA_SUPPORT
+m SOUND
 m MMC
 n EDAC
 n DMADEVICES
@@ -196,7 +197,7 @@ y MOUSE_SYNAPTICS_USB
 #=== Hardware I/O ports
 n SERIO_SERPORT
 #=== Miscellaneous devices
-y INPUT_PCSPKR
+m INPUT_PCSPKR
 m INPUT_ATI_REMOTE2
 m INPUT_POWERMATE
 #== Character devices
@@ -241,14 +242,16 @@ n VGACON_SOFT_SCROLLBACK
 # (this might be nice in the future)
 # y FRAMEBUFFER_CONSOLE_DEFERRED_TAKEOVER
 #== Sound card support
+m SND
 #=== Advanced Linux Sound Architecture
 n SND_SUPPORT_OLD_API
 '2048' SND_HDA_PREALLOC_SIZE
 n SND_DRIVERS
 n SND_X86
 #==== HD-Audio
-y SND_HDA_CODEC_REALTEK
-y SND_HDA_CODEC_HDMI
+m SND_HDA_INTEL
+m SND_HDA_CODEC_REALTEK
+m SND_HDA_CODEC_HDMI
 #==== USB sound devices
 m SND_USB_AUDIO
 #== HID support
