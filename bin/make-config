@@ -1,7 +1,7 @@
 #! /bin/bash
 # vim: ts=2 sw=2 et ai si
 
-# `make nconfig` but keep config in version control
+# configure using config.options and keep both in version control
 
 # eventually, I'd like to augment this script with my own _warn(), etc.
                 # stop the script immediately if
@@ -13,25 +13,22 @@ set -o nounset  #   unset variables are expanded
 
 hsk="${SUROS_KERNEL_DIR:-$HOME/kernel}" ; hsk=${hsk%/}
 
-## TODO: This test is probably is neurotic and overwrought
-#if [[ -n $KBUILD_OUTPUT && $KBULID_OUTPUT != "$hsk/tmp" ]] ; then
-#  cat >&2 <<ERRMSG
-#env var \$KBUILD_OUTPUT is set to
-#  $KBUILD_OUTPUT
-#but this script was about to set it to
-#  $hsk/tmp
-#and I'm just gonna stop here until you change it, because I'm not
-#sure what else to do here, right now. :-b
-#ERRMSG
-#  exit 1
-#fi
-
-# use $hsk
-export KBUILD_OUTPUT="$hsk/tmp"
 cd "$hsk"
 
+# KBUILD_OUTPUT will be used for saving the .config, etc
+if [[ -n $KBUILD_OUTPUT ]] ; then :; else
+  cat >&2 <<ERRMSG
+I was expecting the environment variable
+  \$KBUILD_OUTPUT
+to be set, probably as
+  KBUILD_OUTPUT="$hsk/tmp"
+But it was not. Unable to continue without that set.
+ERRMSG
+  exit 1
+fi
+
 # make sure that ${hsk}/tmp is mounted tmpfs
-# but, first, it would be weird if the parent is a tmpfs
+# but, first, it would be weird if the parent were a tmpfs
 hsk_fs="$(df -T "$hsk" | tail -n 1 | awk '{print $2}')"
 if [[ $hsk_fs == "tmpfs" && -z $WHOLE_KERNEL_IS_TMPFS ]] ; then
   cat >&2 <<ERRMSG
@@ -41,7 +38,6 @@ If this is what you expected, set WHOLE_KERNEL_IS_TMPFS and try again.
 ERRMSG
   exit 1
 fi
-
 hskt_fs="$(df -T "$hsk/tmp" | tail -n 1 | awk '{print $2}')"
 if [[ $hskt_fs == "tmpfs" ]]; then :; else
   fs_file="${hsk}/tmp"
@@ -61,35 +57,69 @@ ERRMSG
   exit 1
 fi
 
+# tmp/ shouldn't be empty
+if ls "$hsk/tmp" > /dev/null ; then :; else
+  cat >&2 <<ERRMSG
+directory ${hsk}/tmp is empty
+filling it with the contents of ${hsk}/build
+ERRMSG
+  cp -vaT "$hsk/build" "$hsk/tmp" >&2
+fi
+# NOW tmp/ REALLY shouldn't be empty
+if ls "$hsk/tmp" > /dev/null ; then :; else
+  cat >&2 <<ERRMSG
+directory ${hsk}/tmp is STILL empty
+(even after filling it with the contents of ${hsk}/build)
+I don't think this is what you want
+ERRMSG
+  exit 1
+fi
+
 # verify config-tmp symlink
 config_tmp="${hsk}/config/config-tmp"
-if [[ -L "$config_tmp" && -e "$config_tmp" ]]; then :; else
-  echo "making symlink to config-tmp"
+if [[ -L "$config_tmp" ]]; then :; else
+  echo "making symlink to config-tmp" >&2
   cd config
   ln -sf ../tmp/.config config-tmp
   cd ..
 fi
+if [[ -e "$config_tmp" ]]; then :; else
+  cat >&2 <<ERRMSG
+directory ${hsk}/tmp isn't empty (I already checked that)
+but symlink
+  $config_tmp
+dangles. Not sure why, but I can't proceed like this.
+ERRMSG
+  exit 1
+fi
 
 # make sure config is already checked in
 cd config
-if git diff-index --quiet HEAD --; then :; else
+if git diff-index HEAD -- | grep "[[:space:]]config$" > /dev/null ; then
+  # this one is wrong if it's TRUE, not false
   cat >&2 <<ERRMSG
-git repository in ${hsk}/config has uncommitted changes
+config file ${hsk}/config/config has uncommitted changes
 ERRMSG
   exit 1
 fi
 cd ..
 
-cd linux
+cd config
+# reset .config to defconfig
+cp x86_64_defconfig config-tmp
+# apply config.options
+bin/config-options config.options
+cd ..
 
-# configure kernel
-make nconfig
+# fill out .config
+cd linux
+make olddefconfig
 
 # commit change
 cd ../config
 diffconfig config config-tmp | sed -e 's/^/  /' > .diffconfig
 cp config-tmp config
-git add config
+git add config config.options
 git commit 
 
 # NOTE: code to prepend kernel version to commit message is in git hook:

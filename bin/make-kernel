@@ -13,6 +13,8 @@ set -o nounset  #   unset variables are expanded
 
 hsk="${SUROS_KERNEL_DIR:-$HOME/kernel}" ; hsk=${hsk%/}
 
+cd "$hsk"
+
 kernel_build_error() {
   local parent_lineno="$1"
   local message="${2:-}"
@@ -35,36 +37,20 @@ ERRMSG
 trap 'kernel_build_error ${LINENO}' ERR
 
 
-## TODO: This test is probably is neurotic and overwrought
-#if [[ -n $KBUILD_OUTPUT && $KBULID_OUTPUT != "$hsk/tmp" ]] ; then
-#  cat >&2 <<ERRMSG
-#env var \$KBUILD_OUTPUT is set to
-#  $KBUILD_OUTPUT
-#but this script was about to set it to
-#  $hsk/tmp
-#and I'm just gonna stop here until you change it, because I'm not
-#sure what else to do here, right now. :-b
-#ERRMSG
-#  exit 1
-#fi
-
-# use $hsk
-export KBUILD_OUTPUT="$hsk/tmp"
-cd "$hsk"
-
-## TODO: Not sure why I care after all
-# make sure config is already checked in
-#cd config
-#if git diff-index --quiet HEAD --; then :; else
-#  cat >&2 <<ERRMSG
-#git repository in ${hsk}/config has uncommitted changes
-#ERRMSG
-#  exit 1
-#fi
-#cd ..
+# KBUILD_OUTPUT used for built kernel and modules
+if [[ -n $KBUILD_OUTPUT ]] ; then :; else
+  cat >&2 <<ERRMSG
+I was expecting the environment variable
+  \$KBUILD_OUTPUT
+to be set, probably as
+  KBUILD_OUTPUT="$hsk/tmp"
+But it was not. Unable to continue without that set.
+ERRMSG
+  exit 1
+fi
 
 # make sure that ${hsk}/tmp is mounted tmpfs
-# but, first, it would be weird if the parent is a tmpfs
+# but, first, it would be weird if the parent were a tmpfs
 hsk_fs="$(df -T "$hsk" | tail -n 1 | awk '{print $2}')"
 if [[ $hsk_fs == "tmpfs" && -z $WHOLE_KERNEL_IS_TMPFS ]] ; then
   cat >&2 <<ERRMSG
@@ -74,7 +60,6 @@ If this is what you expected, set WHOLE_KERNEL_IS_TMPFS and try again.
 ERRMSG
   exit 1
 fi
-
 hskt_fs="$(df -T "$hsk/tmp" | tail -n 1 | awk '{print $2}')"
 if [[ $hskt_fs == "tmpfs" ]]; then :; else
   fs_file="${hsk}/tmp"
@@ -94,24 +79,23 @@ ERRMSG
   exit 1
 fi
 
-# TODO: This test is probably is neurotic and overwrought
-#  particularly since it probably makes the most sense to simply delete
-#  it and re-create it
-# make sure that ${hsk}/build exists, since this is where portage
-# will be looking for it, later
-#if [[ -d "$hsk/build" 
-#   && -r "$hsk/build" 
-#   && -w "$hsk/build" 
-#   && -x "$hsk/build" 
-#]]; then :; else
-#  cat >&2 <<ERRMSG
-#directory $hsk/build doesn't exist or lacks an essential permission.
-#
-#Assuming it doesn't already exist, maybe try:
-#  mkdir -m755 "$hsk/build"
-#ERRMSG
-#  exit 1
-#fi
+# tmp/ shouldn't be empty
+if ls "$hsk/tmp" > /dev/null ; then :; else
+  cat >&2 <<ERRMSG
+directory ${hsk}/tmp is empty
+filling it with the contents of ${hsk}/build
+ERRMSG
+  cp -vaT "$hsk/build" "$hsk/tmp" >&2
+fi
+# NOW tmp/ REALLY shouldn't be empty
+if ls "$hsk/tmp" > /dev/null ; then :; else
+  cat >&2 <<ERRMSG
+directory ${hsk}/tmp is STILL empty
+(even after filling it with the contents of ${hsk}/build)
+I don't think this is what you want
+ERRMSG
+  exit 1
+fi
 
 start_seconds=$SECONDS
 cd linux
