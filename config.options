@@ -1,8 +1,8 @@
 # vim: ft=conf
 
 #= General setup
-"-suros-2" LOCALVERSION
-"Patrick" DEFAULT_HOSTNAME
+"-suros-3" LOCALVERSION
+"patrick" DEFAULT_HOSTNAME
 m IKCONFIG
 y IKCONFIG_PROC
 y BPF_SYSCALL
@@ -41,6 +41,7 @@ y CPU_IDLE_GOV_LADDER
 #= Bus options (PCI etc.)
 n HOTPLUG_PCI
 n PCCARD
+y X86_SYSFB
 
 #= Enable the block layer
 #== IO Schedulers
@@ -88,7 +89,6 @@ y POWERCAP
 #== Generic Driver Options
 "" UEVENT_HELPER_PATH
 #=== Firmware loader
-"i915/kbl_dmc_ver1_04.bin" EXTRA_FIRMWARE
 #== NVME Support
 y BLK_DEV_NVME
 #== Misc devices
@@ -231,9 +231,11 @@ y MEDIA_CAMERA_SUPPORT
 m USB_VIDEO_CLASS
 #== Graphics support
 n AGP
+n DRM_I915
 n LOGO
 #=== Frame buffer Devices
 n FB_EFI
+y FB_SIMPLE
 #=== Backlight & LCD device support
 y LCD_CLASS_DEVICE
 y LCD_PLATFORM
