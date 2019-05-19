@@ -1,0 +1,216 @@
+Kernel command-line parameters are neat! And fucking important!
+
+
+SYSCTL
+
+But they can also be set during the userland portion of boot, by
+systemd-sysctl. See:
+  systemd-sysctl.service(8)
+  sysctl.d(5)
+  sysctl(8)
+
+Many things apparently related to sysctl are given by sys-apps/baselayout, not
+systemd. The systemd-sysctl service is of course part of systemd. Here are the
+big differences as they appear to me by some cursory reading of documentation,
+namely sysctl(8) vs. sysctl.d(5):
+- systemd-sysctl seems to use sysctl.d(5), not sysctl.conf(5)
+- baselayout sysctl prefers, in order of decreasing precedence:
+  - /run/sysctl.d/*.conf
+  - /etc/sysctl.d/*.conf (this really should be before /run, right?)
+  - /usr/local/lib/sysctl.d/*.conf
+  - /usr/lib/sysctl.d/*.conf
+  - /lib/sysctl.d/*.conf
+  - /etc/sysctl.conf (this should be first. Or maybe behind /etc/sysctl.d)
+- systemd-sysctl prefers, in order of decreasing precedence:
+  - /etc/sysctl.d/*.conf
+  - /run/sysctl.d/*.conf
+  - /usr/lib/sysctl.d/*.conf
+- I can find no mention of sysctl.conf anywhere in the systemd documentation.
+
+Aha! But
+  /etc/sysctl.d/99-sysctl.conf
+is a symlink to
+  /etc/sysctl.conf
+
+The default on this machine is that there is no
+  /run/sysctl.d/
+There is a
+  /usr/lib/sysctl.d
+which contains
+  50-coredump.conf  -  use systemd-coredump for core dumps?
+  50-default.conf  - a few systemd defaults for sysrq, net, symlinks, and pipes
+  60-gentoo.conf  - enable all functions of the Magic SysRq Key
+
+I'm not sure how I'll decide which parameters should be on the command line, and
+which should be in sysctl.d. Certainly anything to do with the boot process
+itself should be in the former.
+
+
+MODPROBE
+
+They can also be set by modprobe(8), whetheer on the command line:
+  modprobe usbcore blinkenlights=1
+Or in modprobe.d(5). Modprobe will also read the kernel command line and apply
+any parameters it finds there.
+
+
+WHAT PARRAMETERS EXIST?
+
+There's documentation at
+  https://kernel.org/doc/html/v4.19/admin-guide/kernel-parameters.html
+which includes some general information, such as the stuff above about
+modprobe. It's generated from
+  /usr/src/linux/Documentation/admin-guide/kernel-parameters.rst
+It also has a bunch of paramters, which seems to be taken from
+  /usr/src/linux/Documentation/admin-guide/kernel-parameters.txt
+There's also
+  /usr/src/linux/Documentation/x86/x86_64/boot-options.txt
+which doesn't seem be included in any HTML verison on kernel.org.
+
+The kernel-paramters document explicitly disclaims being "entirely up to date
+and comprehensive". It seems that module parameters are especially likely to
+be absent from this list. One may interrogate a loadable module with
+  modinfo -p ${module_name}
+and in fact this works even with modules that are not currently loaded. Sadly,
+it does not work with modules that are built into the kernel. All loaded
+modules, included those built into the kernel, have files at
+  /sys/module/$(module_name)/parameters/*
+corresponding to each parmeter, but sadly this doesn't seem to include any
+sort of description of the parameter. Some parameters may be changed at
+runtime via these files in /sys/module/*/parameters/*
+
+There's also a list of parameters available via
+  sysctl -a
+but I don't right know know whether those are all also valid boot parameters.
+
+
+/* RANDOM ASIDE
+
+I started looking into all this when I realized that I kept getting printk (for
+USB connections/disconnections, WiFi being down, etc.) on the virtual console.
+Some searching led me to
+  https://wiki.gentoo.org/Systemd/#Configure_verbosity_of_boot_process
+
+This led me to look at proc(5), specifically /proc/sys/kernel/printk, and then
+I don't know how I finally found sysctl(5). And I'm not sure how I was able to
+find the systemd connection, but fortunately I did.
+
+The main thing I came to do was to set
+  loglevel=5
+(or some value). And then I ran into all this.
+
+(end of random aside) */
+
+
+WHAT I'M USING
+
+These are the Linux kernel command-line parameters I'm using:
+
+ro
+
+  default given in grub. Not yet sure why.
+
+
+root=/dev/nvme0n1p2
+
+  Mount this as the root partition.
+
+
+psmouse.synaptics_intertouch=1
+
+  Allow Synaptics touchpad to use extra features unavailable over PS2
+  bus alone. I think. Suggested by a message I saw in dmesg. Here's what dmesg
+  said before I enabled the above parameter:
+  (whitespace inserted for readability)
+
+    psmouse serio2: synaptics: Your touchpad (PNP: SYN1219 PNP0f13)
+                                 says it can support a different bus.
+                               If i2c-hid and hid-rmi are not used,
+                                 you might want to try setting
+                                   psmouse.synaptics_intertouch to 1
+                                 and report this to linux-input@vger.kernel.org.
+    psmouse serio2: synaptics: Touchpad
+                                 model: 1,
+                                 fw: 8.2,
+                                 id: 0x1e2b1,
+                                 caps: 0xf00223/0x840300/0x26800/0x0,
+                                 board id: 3163,
+                                 fw id: 2180635
+    input: SynPS/2 Synaptics TouchPad as
+             /devices/platform/i8042/serio2/input/input13
+
+  Here's what dmesg says now, with the parameter above set:
+  (whitespace inserted for readability)
+
+    usbcore: registered new interface driver synaptics_usb
+    psmouse serio2: synaptics: queried max coordinates: x [..5656], y [..4728]
+    psmouse serio2: synaptics: queried min coordinates: x [1284..], y [1128..]
+    psmouse serio2: synaptics: Trying to set up SMBus access
+    rmi4_smbus 4-002c: registering SMbus-connected sensor
+    rmi4_f01 rmi4-00.fn01: found RMI device,
+                             manufacturer: Synaptics,
+                             product: TM3163-002,
+                             fw id: 2180635
+    input: Synaptics TM3163-002 as /devices/rmi4-00/input/input13
+
+  I've verified that the "SMbus-connected sensor" line did not exist before.
+  I haven't yet experimented to see what actual impact any of this may or may
+  not have.
+
+raid=noautodetect
+
+  Assume there're no RAID devices. Suggested by a message I saw in dmesg.
+  Here's what dmesg said before I enabled the above parameter:
+
+    md: Waiting for all devices to be available before autodetect
+    md: If you don't use raid, use raid=noautodetect
+    md: Autodetecting RAID arrays.
+    md: autorun ...
+    md: ... autorun DONE.
+
+  Here's what dmesg says now, with the parameter above set:
+
+    md: Skipping autodetection of RAID arrays. (raid=autodetect will force)
+
+
+loglevel=5
+
+  Keep merely informational kernel messages from spamming the console.
+    5 = "normal but significant condition" (KERN_NOTICE)
+  default is
+    7 = "debug-level messages" (KERN_DEBUG)
+  FFS.
+
+  In particular, I'm preventing
+  - notices that USB devices have been connected/disconnected
+  - notices that the fucking WiFi isn't connected
+  which are both level
+    6 = "informational" (KERN_INFO)
+
+  I don't think that this one can be set by anything in /sys. It can be set by
+    echo 5 > /proc/sys/kernel/printk
+  and there do exist other parameters at
+    /sys/module/printk/parameters/*
+  but "ignore_loglevel" is only there to (when set to "Y") yank things back to
+  "loglevel=7" territory.
+
+
+console_msg_format=syslog
+
+  Prefix kernel console messages with their loglevel and a timestamp. Looks
+  like this:
+    <7> [31622.238028] french castle: Your mother was a hamster.
+
+  Console messages are ugly. Why not make them uglier?
+
+  I don't think this can be set at runtime.
+
+
+reboot=efi,warm
+
+  Default method of booting is `kbd`, which uses "the keyboard controller".
+  (Does this mean it simulates a CTRL-ALT-DEL?). Let's try using EFI reset.
+  And making it a "warm boot", which is theoretically faster.
+
+  Surprisingly, I don't think this can be set at runtime. Like, for the next
+  reboot.
