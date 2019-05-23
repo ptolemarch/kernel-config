@@ -64,7 +64,7 @@ cd ..
 
 # warn if this kernel is not mentioned anywhere in grub.cfg
 # there really shouldn't be spaces, but let's at least not be lax in verification...
-this_kernel="$(basename $(ls -tr "/boot/vmlinuz*" | tail -n 1))"
+this_kernel="$(basename $(ls -tr /boot/vmlinuz* | tail -n 1))"
 if grep -F -e "$this_kernel" /boot/grub/grub.cfg > /dev/null ; then :; else
   cat >&2 <<ERRMSG
 This new kernel isn't mentioned anywhere in grub.cfg. Before you can boot it,
