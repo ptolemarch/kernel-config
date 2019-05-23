@@ -104,19 +104,23 @@ ERRMSG
 fi
 cd ..
 
-cd config
 # reset .config to defconfig
-cp x86_64_defconfig config-tmp
+cd linux
+make defconfig
+cd ..
+
 # apply config.options
+cd config
 bin/config-options config.options
 cd ..
 
 # fill out .config
 cd linux
 make olddefconfig
+cd ..
 
 # commit change
-cd ../config
+cd config
 diffconfig config config-tmp | sed -e 's/^/  /' > .diffconfig
 cp config-tmp config
 git add config config.options
