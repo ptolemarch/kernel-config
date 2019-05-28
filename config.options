@@ -72,6 +72,7 @@ m BT_HCIBTUSB
 n BT_HCIBTUSB_BCM
 n BT_HCIBTUSB_RTL
 #== Wireless
+m CFG80211
 y CFG80211_WEXT
 
 #= Device Drivers
