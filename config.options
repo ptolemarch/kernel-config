@@ -1,7 +1,7 @@
 # vim: ft=conf
 
 #= General setup
-"-suros-1" LOCALVERSION
+"-suros-2" LOCALVERSION
 "patrick" DEFAULT_HOSTNAME
 m IKCONFIG
 y IKCONFIG_PROC
