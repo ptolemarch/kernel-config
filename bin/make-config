@@ -57,41 +57,9 @@ ERRMSG
   exit 1
 fi
 
-# tmp/ shouldn't be empty
-if ls "$hsk/tmp" > /dev/null ; then :; else
-  cat >&2 <<ERRMSG
-directory ${hsk}/tmp is empty
-filling it with the contents of ${hsk}/build
-ERRMSG
-  cp -vaT "$hsk/build" "$hsk/tmp" >&2
-fi
-# NOW tmp/ REALLY shouldn't be empty
-if ls "$hsk/tmp" > /dev/null ; then :; else
-  cat >&2 <<ERRMSG
-directory ${hsk}/tmp is STILL empty
-(even after filling it with the contents of ${hsk}/build)
-I don't think this is what you want
-ERRMSG
-  exit 1
-fi
 
-# verify config-tmp symlink
-config_tmp="${hsk}/config/config-tmp"
-if [[ -L "$config_tmp" ]]; then :; else
-  echo "making symlink to config-tmp" >&2
-  cd config
-  ln -sf ../tmp/.config config-tmp
-  cd ..
-fi
-if [[ -e "$config_tmp" ]]; then :; else
-  cat >&2 <<ERRMSG
-directory ${hsk}/tmp isn't empty (I already checked that)
-but symlink
-  $config_tmp
-dangles. Not sure why, but I can't proceed like this.
-ERRMSG
-  exit 1
-fi
+# empty tmp/
+find "$hsk/tmp" -depth -mindepth 1 -delete
 
 # make sure config is already checked in
 cd config
